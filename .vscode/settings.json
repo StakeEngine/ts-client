@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",  // use Prettier as default
+  "eslint.format.enable": true,                           // let ESLint handle formatting too
+  "eslint.alwaysShowStatus": true,
+  "files.autoSave": "onFocusChange"
+}
