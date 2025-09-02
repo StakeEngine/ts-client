@@ -100,12 +100,22 @@ type AuthenticateConfig = {
   betLevels: number[];
 };
 
+type Round = {
+  betID: number;
+  amount: number | undefined;
+  payout: number | undefined;
+  payoutMultiplier: number | undefined;
+  active: boolean;
+  mode: string;
+  event: string | undefined;
+  state: unknown;
+};
+
 type AuthenticateResponse = {
   balance: Balance;
   config: AuthenticateConfig;
   jurisdictionFlags: JurisdictionFlags;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  round: any | null;
+  round: Round | null;
 };
 
 type BalanceResponse = {
@@ -117,20 +127,9 @@ type PlayParameters = {
   mode: string;
 };
 
-type PlayRound = {
-  betID: number;
-  amount: number | undefined;
-  payout: number | undefined;
-  payoutMultiplier: number | undefined;
-  active: boolean;
-  mode: string;
-  event: string | undefined;
-  state: unknown;
-};
-
 type PlayResponse = {
   balance: Balance;
-  round: PlayRound;
+  round: Round;
 };
 
 type EndRoundResponse = {
