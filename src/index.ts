@@ -1,11 +1,6 @@
 export { RGSClient } from './client.js';
 
-export {
-  DisplayAmount,
-  DisplayBalance,
-  ParseAmount,
-  parseBalance,
-} from './helpers.js';
+export { DisplayAmount, ParseAmount, parseBalance } from './helpers.js';
 
 export type {
   AuthenticateConfig,
