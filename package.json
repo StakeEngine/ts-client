@@ -1,7 +1,6 @@
 {
-  "name": "ts-client",
+  "name": "@stakeengine/rgs-ts-client",
   "version": "0.1.0",
-  "private": true,
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -22,5 +21,9 @@
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.41.0"
-  }
+  },
+  "description": "Typescript client to communicate with the Stake Engine API.",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
