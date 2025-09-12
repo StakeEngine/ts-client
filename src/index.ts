@@ -1,6 +1,6 @@
 // The lang parameter should be an ISO 639-1 language code.
 // These are the currently supported language codes
-type Language =
+export type Language =
   | 'ar' // (Arabic)
   | 'de' // (German)
   | 'en' // (English)
@@ -19,7 +19,7 @@ type Language =
   | 'zh'; // (Chinese)
 
 // Available currency codes for Stake Engine
-type Currency =
+export type Currency =
   | 'USD' // (United States Dollar)
   | 'CAD' // (Canadian Dollar)
   | 'JPY' // (Japanese Yen)
@@ -43,7 +43,7 @@ type Currency =
   | 'XSC'; // Stake US Stake Cash
 
 // Currency metadata: symbol, default decimals, symbol placement
-const CurrencyMeta: Record<
+export const CurrencyMeta: Record<
   Currency,
   { symbol: string; decimals: number; symbolAfter?: boolean }
 > = {
@@ -65,19 +65,19 @@ const CurrencyMeta: Record<
   TRY: { symbol: '₺', decimals: 2 },
   CLP: { symbol: 'CLP', decimals: 0, symbolAfter: true },
   ARS: { symbol: 'ARS', decimals: 2, symbolAfter: true },
-  PEN: { symbol: 'S/', decimals: 2 },
+  PEN: { symbol: 'S/', decimals: 2, symbolAfter: true },
   XGC: { symbol: 'GC', decimals: 2 },
   XSC: { symbol: 'SC', decimals: 2 },
 };
 
-const API_MULTIPLIER = 1000000;
+export const API_MULTIPLIER = 1_000_000;
 
-type Balance = {
+export type Balance = {
   amount: number;
   currency: Currency;
 };
 
-type JurisdictionFlags = {
+export type JurisdictionFlags = {
   socialCasino: boolean;
   disabledFullscreen: boolean;
   disabledTurbo: boolean;
@@ -92,7 +92,7 @@ type JurisdictionFlags = {
   minimumRoundDuration: number;
 };
 
-type AuthenticateConfig = {
+export type AuthenticateConfig = {
   minBet: number;
   maxBet: number;
   stepBet: number;
@@ -100,43 +100,43 @@ type AuthenticateConfig = {
   betLevels: number[];
 };
 
-type Round = {
+export type Round = {
   betID: number;
-  amount: number | undefined;
-  payout: number | undefined;
-  payoutMultiplier: number | undefined;
+  amount?: number;
+  payout?: number;
+  payoutMultiplier?: number;
   active: boolean;
   mode: string;
-  event: string | undefined;
+  event?: string;
   state: unknown;
 };
 
-type AuthenticateResponse = {
+export type AuthenticateResponse = {
   balance: Balance;
   config: AuthenticateConfig;
   jurisdictionFlags: JurisdictionFlags;
   round: Round | null;
 };
 
-type BalanceResponse = {
+export type BalanceResponse = {
   balance: Balance;
 };
 
-type PlayParameters = {
+export type PlayParameters = {
   amount: number;
   mode: string;
 };
 
-type PlayResponse = {
+export type PlayResponse = {
   balance: Balance;
   round: Round;
 };
 
-type EndRoundResponse = {
+export type EndRoundResponse = {
   balance: Balance;
 };
 
-type EventResponse = {
+export type EventResponse = {
   event: string;
 };
 
@@ -145,7 +145,6 @@ type Client = {
   sessionID: string;
   lang: Language;
   device: string;
-  rgsURL: string;
 
   // Authenticate Parameters
   balance: Balance;
@@ -154,13 +153,15 @@ type Client = {
 
   // API Methods
   Authenticate: () => Promise<AuthenticateResponse>;
-  Balance: () => Promise<BalanceResponse>;
   Play: (params: PlayParameters) => Promise<PlayResponse>;
   EndRound: () => Promise<EndRoundResponse>;
   Event: (eventValue: string) => Promise<EventResponse>;
 };
 
-const NewClient = (options: { url: string }): Client => {
+const RGSClient = (options: {
+  url: string;
+  enforceBetLevels: boolean;
+}): Client => {
   const client = {} as Client;
 
   const url = new URL(options.url);
@@ -185,16 +186,21 @@ const NewClient = (options: { url: string }): Client => {
   client.sessionID = sessionID;
 
   // rgsURL is the base URL for the RGS API. This URL could change based on the environment or Jurisdiction(e.g., rgs.stake-engine.com, rgs-us.stake-engine.com).
-  const rgsURL = searchParams.get('rgs_url');
-  if (!rgsURL) {
+  const paramRGSURL = searchParams.get('rgs_url');
+  if (!paramRGSURL) {
     throw new Error('rgs_url is not in set in url parameters');
   }
-  client.rgsURL = `https://${rgsURL}`;
+  const fullRGSURL = `https://${paramRGSURL}`;
+
+  // Boolean to determine if the client should enforce bet levels on Play requests.
+  // This will default to true if not set.
+  const enforceBetLevels = options.enforceBetLevels ?? true;
+  let roundActive = false;
 
   // Authenticate authorises the session to be used for game play. It also sends back information regarding jurisdiction, player balance and currency
   // and bet levels available for the game for the operator.
   client.Authenticate = async (): Promise<AuthenticateResponse> => {
-    const response = await fetch(`${client.rgsURL}/wallet/authenticate`, {
+    const response = await fetch(`${fullRGSURL}/wallet/authenticate`, {
       method: 'POST',
       body: JSON.stringify({
         sessionID: client.sessionID,
@@ -234,8 +240,20 @@ const NewClient = (options: { url: string }): Client => {
       betLevels: data.config.betLevels,
     };
 
+    const parsed = parseBalance(data.balance);
+
+    // Emit the balance updated event for any listeners
+    emitBalanceEvent(parsed);
+    if (data?.round?.active) {
+      emitRoundActiveEvent(true);
+      roundActive = true;
+    }
+
+    // Update the client with the new balance
+    client.balance = parsed;
+
     return {
-      balance: parseBalance(data.balance),
+      balance: parsed,
       config: client.authenticateConfig,
       jurisdictionFlags: client.jurisdictionFlags,
       round: data.round,
@@ -245,14 +263,14 @@ const NewClient = (options: { url: string }): Client => {
   // Balance is used to retrieve the current balance of the user.
   // This function should not be the primary way to get the balance as other APIs return the balance.
   // Instead, use this API if the player has been inactive for a few minutes to update their balance value.
-  client.Balance = async (): Promise<BalanceResponse> => {
+  const balanceFn = async (): Promise<BalanceResponse> => {
     if (!client.authenticateConfig) {
       throw new Error(
         'Client is not authenticated, please call Authenticate()',
       );
     }
 
-    const response = await fetch(`${client.rgsURL}/wallet/balance`, {
+    const response = await fetch(`${fullRGSURL}/wallet/balance`, {
       method: 'POST',
       body: JSON.stringify({
         sessionID: client.sessionID,
@@ -268,9 +286,26 @@ const NewClient = (options: { url: string }): Client => {
       throw new Error(data);
     }
 
+    const parsed = parseBalance(data.balance);
+    // Emit the balance updated event for any listeners
+    emitBalanceEvent(parsed);
+    // Update the client with the new balance
+    client.balance = parsed;
+
     return {
-      balance: parseBalance(data.balance),
+      balance: parsed,
     };
+  };
+
+  // We want to run the balance on a timer to keep the balance fresh.
+  // So when there isn't a play request we will request the current balance every minute.
+  let balanceInterval: NodeJS.Timeout;
+
+  const startBalanceInterval = () => {
+    if (balanceInterval) {
+      clearInterval(balanceInterval);
+    }
+    balanceInterval = setInterval(balanceFn, 60 * 1000);
   };
 
   // Play creates a bet for the player and returns the player balance and the result for the bet.
@@ -281,12 +316,41 @@ const NewClient = (options: { url: string }): Client => {
       );
     }
 
+    if (roundActive) {
+      throw new Error(
+        'A round is already active, please call EndRound() before starting a new round',
+      );
+    }
+
     if (params.amount % client.authenticateConfig.stepBet !== 0) {
       throw new Error(
         `Bet amount must be a multiple of ${client.authenticateConfig.stepBet}`,
       );
     }
-    const response = await fetch(`${client.rgsURL}/wallet/play`, {
+
+    if (
+      params.amount < client.authenticateConfig.minBet ||
+      params.amount > client.authenticateConfig.maxBet
+    ) {
+      throw new Error(
+        `Bet amount must between min bet (${client.authenticateConfig.minBet}) and max bet (${client.authenticateConfig.maxBet})`,
+      );
+    }
+
+    if (enforceBetLevels) {
+      if (!client.authenticateConfig.betLevels.includes(params.amount)) {
+        throw new Error(
+          `Bet amount must be one of the following levels: ${client.authenticateConfig.betLevels.join(
+            ', ',
+          )}. You may disable bet level enforcement by setting enforceBetLevels to false when creating the client.`,
+        );
+      }
+    }
+
+    emitRoundActiveEvent(true);
+    roundActive = true;
+
+    const response = await fetch(`${fullRGSURL}/wallet/play`, {
       method: 'POST',
       body: JSON.stringify({
         sessionID: client.sessionID,
@@ -301,11 +365,29 @@ const NewClient = (options: { url: string }): Client => {
     const data = await response.json();
 
     if (response.status / 100 !== 2) {
+      emitRoundActiveEvent(false);
+      roundActive = false;
       throw new Error(data);
     }
 
+    const parsed = parseBalance(data.balance);
+
+    // Emit the balance updated event for any listeners
+    emitBalanceEvent(parsed);
+
+    if (!data?.round?.active) {
+      emitRoundActiveEvent(false);
+      roundActive = false;
+    }
+
+    // Restart the balance interval to keep the balance fresh
+    startBalanceInterval();
+
+    // Update the client with the new balance
+    client.balance = parsed;
+
     return {
-      balance: parseBalance(data.balance),
+      balance: parsed,
       round: data.round,
     };
   };
@@ -319,7 +401,7 @@ const NewClient = (options: { url: string }): Client => {
       );
     }
 
-    const response = await fetch(`${client.rgsURL}/wallet/end-round`, {
+    const response = await fetch(`${fullRGSURL}/wallet/end-round`, {
       method: 'POST',
       body: JSON.stringify({
         sessionID: client.sessionID,
@@ -335,12 +417,23 @@ const NewClient = (options: { url: string }): Client => {
       throw new Error(data);
     }
 
+    const parsed = parseBalance(data.balance);
+
+    // Emit the balance updated event for any listeners
+    emitBalanceEvent(parsed);
+    emitRoundActiveEvent(false);
+    roundActive = false;
+
+    // Restart the balance interval to keep the balance fresh
+    startBalanceInterval();
+    // Update the client with the new balance
+    client.balance = parsed;
+
     return {
-      balance: parseBalance(data.balance),
+      balance: parsed,
     };
   };
 
-  // Event is used to keep track of where the player is in an extended round
   client.Event = async (eventValue: string): Promise<EventResponse> => {
     if (!client.authenticateConfig) {
       throw new Error(
@@ -348,7 +441,7 @@ const NewClient = (options: { url: string }): Client => {
       );
     }
 
-    const response = await fetch(`${client.rgsURL}/bet/event`, {
+    const response = await fetch(`${fullRGSURL}/bet/event`, {
       method: 'POST',
       body: JSON.stringify({
         sessionID: client.sessionID,
@@ -390,7 +483,7 @@ const parseBalance = (balance: {
  * ParseAmount converts an RGS amount to a regular decimal number.
  * eg 1_000_000 to a regular decimal number 1.00
  */
-const ParseAmount = (val: number) => {
+const ParseAmount = (val: number): number => {
   return val / API_MULTIPLIER;
 };
 
@@ -398,7 +491,7 @@ const ParseAmount = (val: number) => {
  * Displays a formatted amount from the RGS (eg 1_000_000) to a regular decimal number (eg 1.00).
  * The function is intended to be used for displaying amounts.
  */
-const DisplayAmount = (val: number) => {
+const DisplayAmount = (val: number): string => {
   return ParseAmount(val).toFixed(2);
 };
 
@@ -406,7 +499,7 @@ const DisplayAmount = (val: number) => {
  * Formats a number with its currency symbol, respecting default decimals and symbol placement.
  * The function is intended to be used for displaying balances.
  */
-function DisplayBalance(balance: Balance): string {
+const DisplayBalance = (balance: Balance): string => {
   const meta = CurrencyMeta[balance.currency] ?? {
     symbol: balance.currency,
     amount: ParseAmount(balance.amount),
@@ -420,10 +513,18 @@ function DisplayBalance(balance: Balance): string {
   } else {
     return `${meta.symbol}${formattedAmount}`;
   }
-}
+};
+
+const emitBalanceEvent = (balance: Balance) => {
+  window.dispatchEvent(new CustomEvent('balanceUpdate', { detail: balance }));
+};
+
+const emitRoundActiveEvent = (active: boolean) => {
+  window.dispatchEvent(new CustomEvent('roundActive', { detail: { active } }));
+};
 
 export default {
-  NewClient,
+  RGSClient,
   DisplayBalance,
   DisplayAmount,
   ParseAmount,

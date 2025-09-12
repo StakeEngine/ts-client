@@ -1,2 +1,214 @@
 # ts-client
+
 Typescript client to communicate with the Stake Engine API.
+
+API documentation: https://stake-engine.dev/docs/rgs
+
+# Installation
+
+```
+npm install stake-engine-sdk
+
+or
+
+yarn add stake-engine-sdk
+```
+
+# Usage
+
+```typescript
+import { RGSClient, API_MULTIPLIER } from '../hooks/client';
+
+const rgsClient = client.NewClient({
+  url: window.location.href,
+});
+
+const handleAuthenticate = async () => {
+  const response = await rgsClient.Authenticate();
+  return response;
+};
+
+const handlePlay = async (amount: number, mode: string) => {
+  // ensure amount is RGS compliant amount (1 * API_MULTIPLIER)
+  // Or make sure you pass in a bet level value.
+  const response = await c.Play({
+    amount,
+    mode,
+  });
+
+  return response;
+};
+
+const handleEndRound = async () => {
+  const response = await c.EndRound();
+  return response;
+};
+
+const handleEvent = async () => {
+  const response = await c.Event('some_event');
+  return response;
+};
+```
+
+# Client
+
+Parameters:
+URL
+enforceBetLevels
+
+Gets URL and parses all relevent data available. Setups up all API calls and functions down the line.
+
+## Authenticate
+
+Sets up the Client to make additional API requests. It is the first step required in the API documentation for any new session.
+Returns RGS configuration regarding jurisdiction and other useful information for min and max bet and also bet levels available for the game.
+The first response will trigger a `balanceUpdated` event and may trigger a `roundActive` event if the API returns a currently active round.
+
+## Play
+
+Returns a response for the API for the game.
+
+Emits `balanceUpdated` event and `roundActive` event if the bet is active = true.
+
+## End Round
+
+Closes a currently active round.
+Emits `balanceUpdated` event and `roundActive` with the value event with the value false.
+
+## Event
+
+Sends an event API request to track the state of the bet.
+
+## User Balance
+
+There are 2 ways to get the user balance from the client: Standard request, Event Emitter.
+
+Each request returns the balance in the API response and the frontend can get that value and update its UI like a standard function call.
+
+An event is also emitted to the window everytime the balance of the user is updated with the value of the new balance. You can subscribe to the `balanceUpdated` event VIA `window.addEventListener()` and you will recieve the balance updates in the callback.
+
+When a player has been idle for a few minutes, the client will periodically call the balance endpoints to get an updated balance for the play which is available through the event listener.
+
+# Types
+
+Languages
+Currencies
+Response Types
+Configuration types
+
+# Helper functions
+
+`DisplayBalance(balance: Balance): string`
+`DisplayAmount(val: number): string`
+`ParseAmount(val: number): number`
+`API_MULTIPLIER`
+
+# Events
+
+`balanceUpdate`
+
+```typescript
+type Balance = {
+  amount: number;
+  currency: Currency;
+};
+
+window.addEventListener('balanceUpdate', (event: Event) => {
+  const customEvent = event as CustomEvent<Balance>;
+  console.log('Balance Event', customEvent.detail);
+});
+```
+
+`roundActive`
+
+```typescript
+type RoundState = {
+  active: boolean;
+};
+
+window.addEventListener('roundActive', (event: Event) => {
+  const customEvent = event as CustomEvent<RoundState>;
+  console.log('Balance Event', customEvent.detail);
+});
+```
+
+# Example usage
+
+## REACT: Subscribing to balance events example component
+
+```typescript
+import React, { useEffect, useState } from "react";
+
+type Balance = {
+  amount: number;
+  currency: string;
+};
+
+const BalanceDisplay: React.FC = () => {
+  const [balance, setBalance] = useState<Balance | null>(null);
+
+  useEffect(() => {
+    const handleBalanceUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<Balance>;
+      setBalance(customEvent.detail);
+    };
+
+    window.addEventListener("balanceUpdate", handleBalanceUpdate);
+
+    return () => {
+      window.removeEventListener("balanceUpdate", handleBalanceUpdate);
+    };
+  }, []);
+
+  if (!balance) {
+    return <p className="text-gray-500">Waiting for balance update...</p>;
+  }
+
+  return (
+    <div className="p-4 rounded-2xl shadow bg-white">
+      <h2 className="text-lg font-semibold">Current Balance</h2>
+      <p className="text-xl font-bold">
+        {balance.amount} {balance.currency}
+      </p>
+    </div>
+  );
+};
+
+export default BalanceDisplay;
+```
+
+## Svelte: Subscribing to balance events example
+
+```typescript
+<script lang="ts">
+  type Balance = {
+    amount: number;
+    currency: string;
+  };
+
+  let balance: Balance | null = null;
+
+  const handleBalanceUpdate = (event: CustomEvent<Balance>) => {
+    balance = event.detail;
+  };
+
+  // attach listener when component mounts
+  onMount(() => {
+    window.addEventListener("balanceUpdate", handleBalanceUpdate as EventListener);
+    return () => {
+      window.removeEventListener("balanceUpdate", handleBalanceUpdate as EventListener);
+    };
+  });
+</script>
+
+<div class="p-4 rounded-2xl shadow bg-white">
+  {#if balance}
+    <h2 class="text-lg font-semibold">Current Balance</h2>
+    <p class="text-xl font-bold">
+      {balance.amount} {balance.currency}
+    </p>
+  {:else}
+    <p class="text-gray-500">Waiting for balance update...</p>
+  {/if}
+</div>
+```
