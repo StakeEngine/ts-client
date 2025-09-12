@@ -15,11 +15,33 @@ const ParseAmount = (val) => {
     return val / API_MULTIPLIER;
 };
 /**
- * Displays a formatted amount from the RGS (eg 1_000_000) to a regular decimal number (eg 1.00).
- * The function is intended to be used for displaying amounts.
+ * Formats a number with its currency symbol, respecting default decimals and symbol placement.
+ * The function is intended to be used for displaying balances or amounts and there are configurations to remove symbols and to change the number of decimals displayed.
  */
-const DisplayAmount = (val) => {
-    return ParseAmount(val).toFixed(2);
+const DisplayAmount = (balance, options) => {
+    const meta = CurrencyMeta[balance.currency] ?? {
+        symbol: balance.currency,
+        decimals: 2,
+        symbolAfter: true,
+    };
+    const browserLocale = navigator.language || 'en-US';
+    const amount = ParseAmount(balance.amount);
+    // If the amount is a whole number, show no decimals by default
+    let decimals = options?.decimals ?? meta.decimals;
+    if (options?.wholeNumberDecimals && amount % 1 === 0) {
+        decimals = 0;
+    }
+    const formattedAmount = new Intl.NumberFormat(browserLocale, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    }).format(amount);
+    const removeSymbol = options?.removeSymbol ?? false;
+    if (meta.symbolAfter) {
+        return `${formattedAmount}${!removeSymbol ? ' ' + meta.symbol : ''}`;
+    }
+    else {
+        return `${!removeSymbol ? meta.symbol : ''}${formattedAmount}`;
+    }
 };
 /**
  * Formats a number with its currency symbol, respecting default decimals and symbol placement.
@@ -28,11 +50,14 @@ const DisplayAmount = (val) => {
 const DisplayBalance = (balance) => {
     const meta = CurrencyMeta[balance.currency] ?? {
         symbol: balance.currency,
-        amount: ParseAmount(balance.amount),
+        decimals: 2,
         symbolAfter: true,
     };
-    const useDecimals = meta.decimals;
-    const formattedAmount = balance.amount.toFixed(useDecimals);
+    const browserLocale = navigator.language || 'en-US';
+    const formattedAmount = new Intl.NumberFormat(browserLocale, {
+        minimumFractionDigits: meta.decimals,
+        maximumFractionDigits: meta.decimals,
+    }).format(ParseAmount(balance.amount));
     if (meta.symbolAfter) {
         return `${formattedAmount} ${meta.symbol}`;
     }
@@ -61,8 +86,8 @@ const CurrencyMeta = {
     CLP: { symbol: 'CLP', decimals: 0, symbolAfter: true },
     ARS: { symbol: 'ARS', decimals: 2, symbolAfter: true },
     PEN: { symbol: 'S/', decimals: 2, symbolAfter: true },
-    XGC: { symbol: 'GC', decimals: 2 },
-    XSC: { symbol: 'SC', decimals: 2 },
+    XGC: { symbol: 'GC', decimals: 0, symbolAfter: true },
+    XSC: { symbol: 'SC', decimals: 2, symbolAfter: true },
 };
 const API_MULTIPLIER = 1_000_000;
 export { API_MULTIPLIER, DisplayAmount, DisplayBalance, ParseAmount, parseBalance, };

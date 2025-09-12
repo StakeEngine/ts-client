@@ -13,7 +13,7 @@ type Client = {
 };
 declare const RGSClient: (options: {
     url: string;
-    enforceBetLevels: boolean;
+    enforceBetLevels?: boolean;
 }) => Client;
 export { RGSClient };
 //# sourceMappingURL=client.d.ts.map

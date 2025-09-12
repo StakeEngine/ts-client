@@ -12,10 +12,14 @@ declare const parseBalance: (balance: {
  */
 declare const ParseAmount: (val: number) => number;
 /**
- * Displays a formatted amount from the RGS (eg 1_000_000) to a regular decimal number (eg 1.00).
- * The function is intended to be used for displaying amounts.
+ * Formats a number with its currency symbol, respecting default decimals and symbol placement.
+ * The function is intended to be used for displaying balances or amounts and there are configurations to remove symbols and to change the number of decimals displayed.
  */
-declare const DisplayAmount: (val: number) => string;
+declare const DisplayAmount: (balance: Balance, options?: {
+    removeSymbol?: boolean;
+    decimals?: number;
+    wholeNumberDecimals?: boolean;
+}) => string;
 /**
  * Formats a number with its currency symbol, respecting default decimals and symbol placement.
  * The function is intended to be used for displaying balances.

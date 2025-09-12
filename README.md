@@ -1,23 +1,23 @@
-# ts-client
+# Stake Engine SDK
 
 Typescript client to communicate with the Stake Engine API.
 
-API documentation: https://stake-engine.dev/docs/rgs
+API documentation: https://stake-engine.com/docs/rgs
 
 # Installation
 
 ```
-npm install stake-engine-sdk
+npm install stake-engine
 
 or
 
-yarn add stake-engine-sdk
+yarn add stake-engine
 ```
 
 # Usage
 
 ```typescript
-import { RGSClient, API_MULTIPLIER } from '../hooks/client';
+import { RGSClient } from 'stake-engine';
 
 const rgsClient = client.NewClient({
   url: window.location.href,
@@ -31,7 +31,7 @@ const handleAuthenticate = async () => {
 const handlePlay = async (amount: number, mode: string) => {
   // ensure amount is RGS compliant amount (1 * API_MULTIPLIER)
   // Or make sure you pass in a bet level value.
-  const response = await c.Play({
+  const response = await rgsClient.Play({
     amount,
     mode,
   });
@@ -40,44 +40,15 @@ const handlePlay = async (amount: number, mode: string) => {
 };
 
 const handleEndRound = async () => {
-  const response = await c.EndRound();
+  const response = await rgsClient.EndRound();
   return response;
 };
 
 const handleEvent = async () => {
-  const response = await c.Event('some_event');
+  const response = await rgsClient.Event('some_event');
   return response;
 };
 ```
-
-# Client
-
-Parameters:
-URL
-enforceBetLevels
-
-Gets URL and parses all relevent data available. Setups up all API calls and functions down the line.
-
-## Authenticate
-
-Sets up the Client to make additional API requests. It is the first step required in the API documentation for any new session.
-Returns RGS configuration regarding jurisdiction and other useful information for min and max bet and also bet levels available for the game.
-The first response will trigger a `balanceUpdated` event and may trigger a `roundActive` event if the API returns a currently active round.
-
-## Play
-
-Returns a response for the API for the game.
-
-Emits `balanceUpdated` event and `roundActive` event if the bet is active = true.
-
-## End Round
-
-Closes a currently active round.
-Emits `balanceUpdated` event and `roundActive` with the value event with the value false.
-
-## Event
-
-Sends an event API request to track the state of the bet.
 
 ## User Balance
 
@@ -168,6 +139,7 @@ const BalanceDisplay: React.FC = () => {
     <div className="p-4 rounded-2xl shadow bg-white">
       <h2 className="text-lg font-semibold">Current Balance</h2>
       <p className="text-xl font-bold">
+
         {balance.amount} {balance.currency}
       </p>
     </div>

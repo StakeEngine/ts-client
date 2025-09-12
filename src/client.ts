@@ -32,7 +32,7 @@ type Client = {
 
 const RGSClient = (options: {
   url: string;
-  enforceBetLevels: boolean;
+  enforceBetLevels?: boolean;
 }): Client => {
   const client = {} as Client;
 
