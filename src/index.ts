@@ -523,10 +523,4 @@ const emitRoundActiveEvent = (active: boolean) => {
   window.dispatchEvent(new CustomEvent('roundActive', { detail: { active } }));
 };
 
-export default {
-  RGSClient,
-  DisplayBalance,
-  DisplayAmount,
-  ParseAmount,
-  API_MULTIPLIER,
-};
+export { DisplayAmount, DisplayBalance, ParseAmount, RGSClient };
