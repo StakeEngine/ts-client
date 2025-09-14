@@ -20,11 +20,6 @@ declare const DisplayAmount: (balance: Balance, options?: {
     decimals?: number;
     wholeNumberDecimals?: boolean;
 }) => string;
-/**
- * Formats a number with its currency symbol, respecting default decimals and symbol placement.
- * The function is intended to be used for displaying balances.
- */
-declare const DisplayBalance: (balance: Balance) => string;
 declare const API_MULTIPLIER = 1000000;
-export { API_MULTIPLIER, DisplayAmount, DisplayBalance, ParseAmount, parseBalance, };
+export { API_MULTIPLIER, DisplayAmount, ParseAmount, parseBalance };
 //# sourceMappingURL=helpers.d.ts.map

@@ -1,3 +1,5 @@
+import * as data from '../package.json' with { type: 'json' };
+
 import { parseBalance } from './helpers.js';
 import type {
   AuthenticateConfig,
@@ -34,6 +36,10 @@ const RGSClient = (options: {
   url: string;
   enforceBetLevels?: boolean;
 }): Client => {
+  console.log(
+    `Stake Engine Client Version: ${data.default.version}`,
+    'background: #222; color: #e9bc6fff',
+  );
   const client = {} as Client;
 
   const url = new URL(options.url);
@@ -52,6 +58,7 @@ const RGSClient = (options: {
 
   // SessionID is a unique identifier for the user's session and will be used by all requests.
   const sessionID = searchParams.get('sessionID');
+
   if (!sessionID) {
     throw new Error('sessionID is not in set in url parameters');
   }
