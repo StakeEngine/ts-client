@@ -19,7 +19,7 @@ yarn add stake-engine
 ```typescript
 import { RGSClient } from 'stake-engine';
 
-const rgsClient = client.NewClient({
+const rgsClient = RGSClient({
   url: window.location.href,
 });
 
