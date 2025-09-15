@@ -1,4 +1,4 @@
-# Stake Engine SDK
+# Stake Engine SDK (BETA)
 
 Typescript client to communicate with the Stake Engine API.
 
@@ -62,21 +62,21 @@ When a player has been idle for a few minutes, the client will periodically call
 
 # Types
 
-Languages
-Currencies
-Response Types
-Configuration types
+- Languages
+- Currencies
+- Response Types
+- Configuration types
 
 # Helper functions
 
-`DisplayBalance(balance: Balance): string`
-`DisplayAmount(val: number): string`
-`ParseAmount(val: number): number`
-`API_MULTIPLIER`
+- `DisplayBalance(balance: Balance): string`
+- `DisplayAmount(val: number): string`
+- `ParseAmount(val: number): number`
+- `API_MULTIPLIER`
 
 # Events
 
-`balanceUpdate`
+Listen to `balanceUpdate` events to update the balance in the UI. This triggers any time a Balance object is returned from the API.
 
 ```typescript
 type Balance = {
@@ -90,7 +90,7 @@ window.addEventListener('balanceUpdate', (event: Event) => {
 });
 ```
 
-`roundActive`
+Listen to `roundActive` events to know whether to enable or disable UI buttons
 
 ```typescript
 type RoundState = {
