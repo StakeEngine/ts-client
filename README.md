@@ -48,6 +48,19 @@ const handleEvent = async () => {
   const response = await rgsClient.Event('some_event');
   return response;
 };
+
+
+/*
+  Params:
+    decimals: Forces a certain number of decimals, otherwise defaults to a reasonable value based on currency.
+    removeSymbol: Removes the currency symbol from the string EG CAD$1.99 -> 1.99
+    trimDecimalForIntegers: Any number that is a whole number will not display the decimal points. This may help when displaying bet levels. EG 2.00 -> 2
+*/
+DisplayAmount(balance, {
+  removeSymbol?: boolean;
+    decimals: 2,
+    wholeNumberDecimals: true,
+});
 ```
 
 ## User Balance

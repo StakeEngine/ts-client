@@ -30,7 +30,7 @@ const DisplayAmount = (
   options?: {
     removeSymbol?: boolean;
     decimals?: number;
-    wholeNumberDecimals?: boolean;
+    trimDecimalForIntegers?: boolean;
   },
 ): string => {
   const meta = CurrencyMeta[balance.currency] ?? {
@@ -45,7 +45,7 @@ const DisplayAmount = (
 
   // If the amount is a whole number, show no decimals by default
   let decimals = options?.decimals ?? meta.decimals;
-  if (options?.wholeNumberDecimals && amount % 1 === 0) {
+  if (options?.trimDecimalForIntegers && amount % 1 === 0) {
     decimals = 0;
   }
 
