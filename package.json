@@ -1,6 +1,6 @@
 {
   "name": "stake-engine",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -29,5 +29,11 @@
   "description": "Typescript client to communicate with the Stake Engine API.",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
 }

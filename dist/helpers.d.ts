@@ -18,7 +18,7 @@ declare const ParseAmount: (val: number) => number;
 declare const DisplayAmount: (balance: Balance, options?: {
     removeSymbol?: boolean;
     decimals?: number;
-    wholeNumberDecimals?: boolean;
+    trimDecimalForIntegers?: boolean;
 }) => string;
 declare const API_MULTIPLIER = 1000000;
 export { API_MULTIPLIER, DisplayAmount, ParseAmount, parseBalance };
