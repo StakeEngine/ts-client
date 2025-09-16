@@ -196,3 +196,15 @@ export default BalanceDisplay;
   {/if}
 </div>
 ```
+
+# Contributing
+
+TL;DR
+
+1. Submit feedback via GitHub Issues
+2. Participate in conversations via Discord
+3. Contribute to our documentation by opening a Pull Request
+
+If you've made it here, thank you for wanting to contribute to our project!
+
+Help us create and improve this product! We want your input and we want your feedback!
