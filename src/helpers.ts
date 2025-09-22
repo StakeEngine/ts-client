@@ -87,6 +87,7 @@ const CurrencyMeta: Record<
   CLP: { symbol: 'CLP', decimals: 0, symbolAfter: true },
   ARS: { symbol: 'ARS', decimals: 2, symbolAfter: true },
   PEN: { symbol: 'S/', decimals: 2, symbolAfter: true },
+  NGN: { symbol: '₦', decimals: 0, symbolAfter: true },
   XGC: { symbol: 'GC', decimals: 0, symbolAfter: true },
   XSC: { symbol: 'SC', decimals: 2, symbolAfter: true },
 };

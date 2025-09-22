@@ -39,6 +39,7 @@ type Currency =
   | 'CLP' // (Chilean Peso)
   | 'ARS' // (Argentine Peso)
   | 'PEN' // (Peruvian Sol)
+  | 'NGN' // (Nigeria Naira)
   | 'XGC' // Stake US Gold Coin
   | 'XSC'; // Stake US Stake Cash
 
