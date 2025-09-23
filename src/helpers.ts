@@ -63,6 +63,45 @@ const DisplayAmount = (
   }
 };
 
+// Supported Currencies
+// | Currency                     | Abbreviation | Display  | Example  |
+// | ---------------------------- | ------------ | -------- | -------- |
+// | United States Dollar         | USD          | $        | $10.00   |
+// | Canadian Dollar              | CAD          | CA$      | CA$10.00 |
+// | Japanese Yen                 | JPY          | ¥        | ¥10      |
+// | Euro                         | EUR          | €        | €10.00   |
+// | Russian Ruble                | RUB          | ₽        | ₽10.00   |
+// | Chinese Yuan                 | CNY          | CN¥      | CN¥10.00 |
+// | Philippine Peso              | PHP          | ₱        | ₱10.00   |
+// | Indian Rupee                 | INR          | ₹        | ₹10.00   |
+// | Indonesian Rupiah            | IDR          | Rp       | Rp10     |
+// | South Korean Won             | KRW          | ₩        | ₩10      |
+// | Brazilian Real               | BRL          | R$       | R$10.00  |
+// | Mexican Peso                 | MXN          | MX$      | MX$10.00 |
+// | Danish Krone                 | DKK          | KR       | 10.00 KR |
+// | Polish Złoty                 | PLN          | zł       | 10.00 zł |
+// | Vietnamese Đồng              | VND          | ₫        | 10 ₫     |
+// | Turkish Lira                 | TRY          | ₺        | ₺10.00   |
+// | Chilean Peso                 | CLP          | CLP      | 10 CLP   |
+// | Argentine Peso               | ARS          | ARS      | 10.00 ARS|
+// | Peruvian Sol                 | PEN          | S/       | S/10.00  |
+// | Nigerian Naira               | NGN          | ₦        | ₦10.00   |
+// | Saudi Arabia Riyal           | SAR          | SAR      | 10.00 SAR|
+// | Israel Shekel                | ILS          | ILS      | 10.00 ILS|
+// | United Arab Emirates Dirham  | AED          | AED      | 10.00 AED|
+// | Taiwan New Dollar            | TWD          | NT$      | NT$10.00 |
+// | Norway Krone                 | NOK          | kr       | kr10.00  |
+// | Kuwaiti Dinar                | KWD          | KD       | KD10.00  |
+// | Jordanian Dinar              | JOD          | JD       | JD10.00  |
+// | Costa Rica Colon             | CRC          | ₡        | ₡10.00   |
+// | Tunisian Dinar               | TND          | TND      | 10.00 TND|
+// | Singapore Dollar             | SGD          | SG$      | SG$10.00 |
+// | Malaysia Ringgit             | MYR          | RM       | RM10.00  |
+// | Oman Rial                    | OMR          | OMR      | 10.00 OMR|
+// | Qatar Riyal                  | QAR          | QAR      | 10.00 QAR|
+// | Bahraini Dinar               | BHD          | BD       | BD10.00  |
+// | Stake Gold Coin              | XGC          | GC       | 10.00 GC |
+// | Stake Cash                   | XSC          | SC       | 10.00 SC |
 // Currency metadata: symbol, default decimals, symbol placement
 const CurrencyMeta: Record<
   Currency,
@@ -87,7 +126,21 @@ const CurrencyMeta: Record<
   CLP: { symbol: 'CLP', decimals: 0, symbolAfter: true },
   ARS: { symbol: 'ARS', decimals: 2, symbolAfter: true },
   PEN: { symbol: 'S/', decimals: 2, symbolAfter: true },
-  NGN: { symbol: '₦', decimals: 0, symbolAfter: true },
+  NGN: { symbol: '₦', decimals: 0 },
+  SAR: { symbol: 'SAR', decimals: 2, symbolAfter: true },
+  ILS: { symbol: 'ILS', decimals: 2, symbolAfter: true },
+  AED: { symbol: 'AED', decimals: 2, symbolAfter: true },
+  TWD: { symbol: 'NT$', decimals: 2 },
+  NOK: { symbol: 'kr', decimals: 2 },
+  KWD: { symbol: 'KD', decimals: 2 },
+  JOD: { symbol: 'JD', decimals: 2 },
+  CRC: { symbol: '₡', decimals: 2 },
+  TND: { symbol: 'TND', decimals: 2, symbolAfter: true },
+  SGD: { symbol: 'SG$', decimals: 2 },
+  MYR: { symbol: 'RM', decimals: 2 },
+  OMR: { symbol: 'OMR', decimals: 2, symbolAfter: true },
+  QAR: { symbol: 'QAR', decimals: 2, symbolAfter: true },
+  BHD: { symbol: 'BD', decimals: 2 },
   XGC: { symbol: 'GC', decimals: 0, symbolAfter: true },
   XSC: { symbol: 'SC', decimals: 2, symbolAfter: true },
 };

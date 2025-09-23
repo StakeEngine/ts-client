@@ -40,6 +40,20 @@ type Currency =
   | 'ARS' // (Argentine Peso)
   | 'PEN' // (Peruvian Sol)
   | 'NGN' // (Nigeria Naira)
+  | 'SAR' // Saudi Arabia Riyal
+  | 'ILS' // Israel Shekel
+  | 'AED' // United Arab Emirates Dirham
+  | 'TWD' // Taiwan New Dollar
+  | 'NOK' // Norway Krone
+  | 'KWD' // Kuwaiti Dinar
+  | 'JOD' // Jordanian Dinar
+  | 'CRC' // Costa Rica Colon
+  | 'TND' // Tunisian Dinar
+  | 'SGD' // Singapore Dollar
+  | 'MYR' // Malaysia Ringgit
+  | 'OMR' // Oman Rial
+  | 'QAR' // Qatar Riyal
+  | 'BHD' // Bahraini Dinar
   | 'XGC' // Stake US Gold Coin
   | 'XSC'; // Stake US Stake Cash
 
