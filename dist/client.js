@@ -25,7 +25,7 @@ const RGSClient = (options) => {
     if (!paramRGSURL) {
         throw new Error('rgs_url is not in set in url parameters');
     }
-    const fullRGSURL = `https://${paramRGSURL}`;
+    const fullRGSURL = `${options.protocol ?? 'https'}://${paramRGSURL}`;
     // Boolean to determine if the client should enforce bet levels on Play requests.
     // This will default to true if not set.
     const enforceBetLevels = options.enforceBetLevels ?? true;
