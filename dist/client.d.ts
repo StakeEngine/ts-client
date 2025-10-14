@@ -14,6 +14,7 @@ type Client = {
 declare const RGSClient: (options: {
     url: string;
     enforceBetLevels?: boolean;
+    protocol?: "http" | "https";
 }) => Client;
 export { RGSClient };
 //# sourceMappingURL=client.d.ts.map
