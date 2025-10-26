@@ -1,5 +1,5 @@
 type Language = 'ar' | 'de' | 'en' | 'es' | 'fi' | 'fr' | 'hi' | 'id' | 'ja' | 'ko' | 'pl' | 'pt' | 'ru' | 'tr' | 'vi' | 'zh';
-type Currency = 'USD' | 'CAD' | 'JPY' | 'EUR' | 'RUB' | 'CNY' | 'PHP' | 'INR' | 'IDR' | 'KRW' | 'BRL' | 'MXN' | 'DKK' | 'PLN' | 'VND' | 'TRY' | 'CLP' | 'ARS' | 'PEN' | 'XGC' | 'XSC';
+type Currency = 'USD' | 'CAD' | 'JPY' | 'EUR' | 'RUB' | 'CNY' | 'PHP' | 'INR' | 'IDR' | 'KRW' | 'BRL' | 'MXN' | 'DKK' | 'PLN' | 'VND' | 'TRY' | 'CLP' | 'ARS' | 'PEN' | 'NGN' | 'SAR' | 'ILS' | 'AED' | 'TWD' | 'NOK' | 'KWD' | 'JOD' | 'CRC' | 'TND' | 'SGD' | 'MYR' | 'OMR' | 'QAR' | 'BHD' | 'XGC' | 'XSC';
 type Balance = {
     amount: number;
     currency: Currency;
