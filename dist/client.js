@@ -44,7 +44,7 @@ const RGSClient = (options) => {
             },
         });
         const data = await response.json();
-        if (response.status / 100 !== 2) {
+        if (!response.ok) {
             throw new Error(data);
         }
         client.jurisdictionFlags = {
@@ -101,7 +101,7 @@ const RGSClient = (options) => {
             },
         });
         const data = await response.json();
-        if (response.status / 100 !== 2) {
+        if (!response.ok) {
             throw new Error(data);
         }
         const parsed = parseBalance(data.balance);
@@ -156,7 +156,7 @@ const RGSClient = (options) => {
             },
         });
         const data = await response.json();
-        if (response.status / 100 !== 2) {
+        if (!response.ok) {
             emitRoundActiveEvent(false);
             roundActive = false;
             throw new Error(data);
@@ -193,7 +193,7 @@ const RGSClient = (options) => {
             },
         });
         const data = await response.json();
-        if (response.status / 100 !== 2) {
+        if (!response.ok) {
             throw new Error(data);
         }
         const parsed = parseBalance(data.balance);
@@ -224,7 +224,7 @@ const RGSClient = (options) => {
             },
         });
         const data = await response.json();
-        if (response.status / 100 !== 2) {
+        if (!response.ok) {
             throw new Error(data);
         }
         return {
