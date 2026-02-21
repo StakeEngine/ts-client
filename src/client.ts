@@ -14,7 +14,7 @@ import type {
   PlayResponse,
 } from './types.js';
 
-type Client = {
+type Client<T = unknown> = {
   // URL Parameters
   sessionID: string;
   lang: Language;
@@ -26,22 +26,22 @@ type Client = {
   jurisdictionFlags: JurisdictionFlags;
 
   // API Methods
-  Authenticate: () => Promise<AuthenticateResponse>;
-  Play: (params: PlayParameters) => Promise<PlayResponse>;
+  Authenticate: () => Promise<AuthenticateResponse<T>>;
+  Play: (params: PlayParameters) => Promise<PlayResponse<T>>;
   EndRound: () => Promise<EndRoundResponse>;
   Event: (eventValue: string) => Promise<EventResponse>;
 };
 
-const RGSClient = (options: {
+const RGSClient = <T = unknown>(options: {
   url: string;
   enforceBetLevels?: boolean;
   protocol?: 'http' | 'https';
-}): Client => {
+}): Client<T> => {
   console.log(
     `Stake Engine Client Version: ${data.default.version}`,
     'background: #222; color: #e9bc6fff',
   );
-  const client = {} as Client;
+  const client = {} as Client<T>;
 
   const url = new URL(options.url);
   const searchParams = url.searchParams;
@@ -79,7 +79,7 @@ const RGSClient = (options: {
 
   // Authenticate authorises the session to be used for game play. It also sends back information regarding jurisdiction, player balance and currency
   // and bet levels available for the game for the operator.
-  client.Authenticate = async (): Promise<AuthenticateResponse> => {
+  client.Authenticate = async (): Promise<AuthenticateResponse<T>> => {
     const response = await fetch(`${fullRGSURL}/wallet/authenticate`, {
       method: 'POST',
       body: JSON.stringify({
@@ -189,7 +189,7 @@ const RGSClient = (options: {
   };
 
   // Play creates a bet for the player and returns the player balance and the result for the bet.
-  client.Play = async (params: PlayParameters): Promise<PlayResponse> => {
+  client.Play = async (params: PlayParameters): Promise<PlayResponse<T>> => {
     if (!client.authenticateConfig) {
       throw new Error(
         'Client is not authenticated, please call Authenticate()',
