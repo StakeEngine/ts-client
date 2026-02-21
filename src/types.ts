@@ -85,7 +85,7 @@ type AuthenticateConfig = {
   betLevels: number[];
 };
 
-type Round = {
+type Round<T = unknown> = {
   betID: number;
   amount?: number;
   payout?: number;
@@ -93,14 +93,14 @@ type Round = {
   active: boolean;
   mode: string;
   event?: string;
-  state: unknown;
+  state: T;
 };
 
-type AuthenticateResponse = {
+type AuthenticateResponse<T = unknown> = {
   balance: Balance;
   config: AuthenticateConfig;
   jurisdictionFlags: JurisdictionFlags;
-  round: Round | null;
+  round: Round<T> | null;
 };
 
 type BalanceResponse = {
@@ -112,9 +112,9 @@ type PlayParameters = {
   mode: string;
 };
 
-type PlayResponse = {
+type PlayResponse<T = unknown> = {
   balance: Balance;
-  round: Round;
+  round: Round<T>;
 };
 
 type EndRoundResponse = {
